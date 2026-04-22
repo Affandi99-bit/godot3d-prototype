@@ -5,6 +5,7 @@ signal interacted(body)
 
 @export var prompt_message="Interact"
 @export var prompt_action="interact"
+@onready var touched = $Touched
 
 func get_prompt():
 	var _key_name=""
@@ -14,4 +15,9 @@ func get_prompt():
 		return prompt_message + "\n[" + _key_name + "]"
 
 func interact(body):
-	emit_signal("interacted",body)
+	emit_signal("interacted", body)
+
+	if touched:
+		touched.interact()
+
+	print("Item interacted")

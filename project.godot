@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="3dexperiment"
-run/main_scene="uid://d3xxa6lk2dfym"
+run/main_scene="res://scenes/game.tscn"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+InputSetup="*res://scripts/autoload/input_setup.gd"
 
 [input]
 

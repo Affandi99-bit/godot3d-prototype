@@ -1,0 +1,39 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/enemy_ai.gd" id="1_ai"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/combat/damageable.gd" id="3_damageable"]
+[ext_resource type="Script" path="res://scripts/components/hit_flash.gd" id="4_flash"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+radius = 0.4
+height = 1.4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
+radius = 0.4
+height = 1.4
+
+[node name="Enemy" type="CharacterBody3D"]
+
+[node name="Damageable" type="Node" parent="."]
+script = ExtResource("3_damageable")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 8
+
+[node name="HitFlash" type="Node" parent="."]
+script = ExtResource("4_flash")
+target = NodePath("../Mesh")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0.7, 0)
+mesh = SubResource("CapsuleMesh_1")
+
+[node name="Collider" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+shape = SubResource("CapsuleShape3D_1")
+
+[node name="AI" type="Node" parent="."]
+script = ExtResource("1_ai")
+

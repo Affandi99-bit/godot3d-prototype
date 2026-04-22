@@ -1,0 +1,51 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://addons/proto_controller/proto_controller.tscn" id="1_proto"]
+[ext_resource type="Script" path="res://scripts/player/inventory.gd" id="2_inventory"]
+[ext_resource type="Script" path="res://scripts/player/player_input_inventory.gd" id="3_inv_input"]
+[ext_resource type="Script" path="res://scripts/player/player_interactor.gd" id="4_interactor"]
+[ext_resource type="Script" path="res://scripts/player/player_combat.gd" id="5_combat"]
+[ext_resource type="Script" path="res://scripts/components/health.gd" id="6_health"]
+[ext_resource type="Script" path="res://scripts/combat/damageable.gd" id="7_damageable"]
+[ext_resource type="Script" path="res://scripts/components/hit_flash.gd" id="8_flash"]
+[ext_resource type="PackedScene" path="res://scenes/items/item_pickup.tscn" id="9_drop_scene"]
+[ext_resource type="PackedScene" path="res://scenes/combat/projectile.tscn" id="10_projectile"]
+
+[node name="Player" instance=ExtResource("1_proto")]
+groups=["player"]
+
+[node name="Damageable" type="Node" parent="."]
+script = ExtResource("7_damageable")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("6_health")
+max_health = 25
+
+[node name="HitFlash" type="Node" parent="."]
+script = ExtResource("8_flash")
+target = NodePath("../Mesh")
+
+[node name="Inventory" type="Node" parent="."]
+script = ExtResource("2_inventory")
+drop_scene = ExtResource("9_drop_scene")
+
+[node name="InventoryInput" type="Node" parent="."]
+script = ExtResource("3_inv_input")
+inventory_path = NodePath("../Inventory")
+
+[node name="Interactor" type="Node" parent="."]
+script = ExtResource("4_interactor")
+camera_path = NodePath("../Head/Camera3D")
+
+[node name="Combat" type="Node" parent="."]
+script = ExtResource("5_combat")
+camera_path = NodePath("../Head/Camera3D")
+inventory_path = NodePath("../Inventory")
+projectile_scene = ExtResource("10_projectile")
+
+[node name="InteractRay" parent="Head"]
+enabled = false
+
+[node name="prompt" parent="Head/InteractRay"]
+visible = false
+

@@ -1,0 +1,82 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player/player_proto.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/enemy_basic.tscn" id="2_enemy"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/world/door.tscn" id="4_door"]
+[ext_resource type="PackedScene" path="res://scenes/world/chest.tscn" id="5_chest"]
+[ext_resource type="PackedScene" path="res://scenes/world/lever.tscn" id="6_lever"]
+[ext_resource type="PackedScene" path="res://scenes/world/npc.tscn" id="7_npc"]
+[ext_resource type="PackedScene" path="res://scenes/items/item_pickup.tscn" id="8_pickup"]
+[ext_resource type="Resource" path="res://resources/items/sword.tres" id="9_sword"]
+[ext_resource type="Resource" path="res://resources/items/potion.tres" id="10_potion"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(40, 1, 40)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(40, 1, 40)
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 4
+ambient_light_source = 1
+ambient_light_color = Color(0.2, 0.2, 0.25, 1)
+
+[node name="Game" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, 0.353553, -0.353553, 0, 0.707107, 0.707107, 0.5, -0.612372, 0.612372, 0, 8, 0)
+light_energy = 2.0
+shadow_enabled = true
+
+[node name="FillLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 2)
+light_energy = 0.8
+omni_range = 20.0
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
+player_path = NodePath("../Player")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 4)
+groups=["player"]
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_floor")
+
+[node name="Enemy" parent="." instance=ExtResource("2_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -6)
+
+[node name="AI" parent="Enemy"]
+player_path = NodePath("../../Player")
+
+[node name="Door" parent="." instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, -2)
+
+[node name="Lever" parent="." instance=ExtResource("6_lever")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.5, -2)
+
+[node name="Chest" parent="." instance=ExtResource("5_chest")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.35, -2)
+pickup_scene = ExtResource("8_pickup")
+item_to_spawn = ExtResource("9_sword")
+
+[node name="NPC" parent="." instance=ExtResource("7_npc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -6)
+
+[node name="PotionPickup" parent="." instance=ExtResource("8_pickup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.1, 0)
+item = ExtResource("10_potion")
+
+[connection signal="toggled" from="Lever" to="Door" method="set_enabled"]
+[connection signal="dialogue_requested" from="NPC" to="HUD" method="start_dialogue"]
+
