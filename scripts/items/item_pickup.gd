@@ -22,12 +22,11 @@ func _update_label() -> void:
 func _on_body_entered(body: Node) -> void:
 	if not item:
 		return
-	var inv := body.get_node_or_null(^"Inventory") as Inventory
+	var inv := body.get_node_or_null(^"Inventory")
 	if not inv:
-		inv = body.get_node_or_null(^"../Inventory") as Inventory
+		inv = body.get_node_or_null(^"../Inventory")
 	if not inv:
 		return
-	if inv.pickup(item):
+	if inv.has_method("pickup") and inv.call("pickup", item):
 		picked.emit(body, item)
 		queue_free()
-

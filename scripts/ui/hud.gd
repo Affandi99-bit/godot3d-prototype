@@ -10,9 +10,9 @@ extends CanvasLayer
 @onready var dialogue_panel: Control = $DialoguePanel
 
 var _player: Node
-var _inv: Inventory
-var _health: Health
-var _interactor: PlayerInteractor
+var _inv: Node
+var _health: Node
+var _interactor: Node
 var _lock_target: Node
 
 func _ready() -> void:
@@ -31,21 +31,26 @@ func _bind_player() -> void:
 		_player = get_tree().get_first_node_in_group("player")
 	if not _player:
 		return
-	_inv = _player.get_node_or_null(^"Inventory") as Inventory
-	_health = _player.get_node_or_null(^"Health") as Health
-	_interactor = _player.get_node_or_null(^"Interactor") as PlayerInteractor
+	_inv = _player.get_node_or_null(^"Inventory")
+	_health = _player.get_node_or_null(^"Health")
+	_interactor = _player.get_node_or_null(^"Interactor")
 	_lock_target = _player
 
 	if _health:
-		_health.changed.connect(_on_health_changed)
-		_on_health_changed(_health.current_health, _health.max_health)
+		if _health.has_signal("changed"):
+			_health.connect("changed", _on_health_changed)
+		if ("current_health" in _health) and ("max_health" in _health):
+			_on_health_changed(int(_health.get("current_health")), int(_health.get("max_health")))
 
 	if _interactor:
-		_interactor.focus_changed.connect(_on_focus_changed)
+		if _interactor.has_signal("focus_changed"):
+			_interactor.connect("focus_changed", _on_focus_changed)
 
 	if _inv:
-		_inv.changed.connect(_on_inventory_changed)
-		_on_inventory_changed(_inv.slots, _inv.active_index)
+		if _inv.has_signal("changed"):
+			_inv.connect("changed", _on_inventory_changed)
+		if ("slots" in _inv) and ("active_index" in _inv):
+			_on_inventory_changed(_inv.get("slots"), int(_inv.get("active_index")))
 
 	var dlg := dialogue_panel as DialoguePanel
 	if dlg:

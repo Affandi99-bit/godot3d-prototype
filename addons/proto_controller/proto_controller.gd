@@ -44,11 +44,16 @@ extends CharacterBody3D
 @export var stamina_max : float = 100.0
 @export var stamina_recovery_rate : float = 15.0   # per second
 @export var stamina_drain_rate : float = 25.0      # per second
-@export var stamina_regen_delay : float = 1.0      # seconds before regen starts
-@onready var staminaProgress = $TextureProgressBar
+@export var stamina_regen_delay : float = 10.0     # seconds before regen starts
+@export var exhausted_duration : float = 1.0       # seconds slowed after stamina empty
+@export var exhausted_speed_multiplier : float = 0.45
+@onready var stamina_progress := (
+	get_node_or_null(^"TextureProgressBar") as TextureProgressBar
+)
 
 var stamina : float = stamina_max
 var regen_timer : float = 0.0
+var exhausted_timer : float = 0.0
 ### END STAMINA SYSTEM
 
 var mouse_captured : bool = false
@@ -103,28 +108,36 @@ func _physics_process(delta: float) -> void:
 			velocity.y = jump_velocity
 
 	var sprinting := false
-	if can_sprint and Input.is_action_pressed(input_sprint) and stamina > 0:
+	if can_sprint and exhausted_timer <= 0.0 and Input.is_action_pressed(input_sprint) and stamina > 0.0:
 		sprinting = true
 	else:
 		sprinting = false
 
-	if sprinting:
+	if exhausted_timer > 0.0:
+		exhausted_timer = maxf(0.0, exhausted_timer - delta)
+		move_speed = base_speed * exhausted_speed_multiplier
+	elif sprinting:
 		move_speed = sprint_speed
 		stamina -= stamina_drain_rate * delta
-		if stamina <= 0:
-			stamina = 0
+		if stamina <= 0.0:
+			stamina = 0.0
 			sprinting = false
-			move_speed = base_speed
-		regen_timer = 0.0
-		staminaProgress.value = stamina
+			exhausted_timer = exhausted_duration
+			move_speed = base_speed * exhausted_speed_multiplier
+		regen_timer = 0.0 # regen starts after delay from last sprint drain
+		if stamina_progress:
+			stamina_progress.max_value = stamina_max
+			stamina_progress.value = stamina
 	else:
 		move_speed = base_speed
 		if stamina < stamina_max:
 			regen_timer += delta
 			if regen_timer >= stamina_regen_delay:
 				stamina += stamina_recovery_rate * delta
-				stamina = clamp(stamina, 0, stamina_max)
-			staminaProgress.value = stamina
+				stamina = clampf(stamina, 0.0, stamina_max)
+			if stamina_progress:
+				stamina_progress.max_value = stamina_max
+				stamina_progress.value = stamina
 			
 	# Apply desired movement to velocity
 	if can_move:

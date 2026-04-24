@@ -5,4 +5,4 @@
 [node name="Node3D" type="Node3D"]
 
 [node name="Game" parent="." instance=ExtResource("1_tyffc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.029757, -1.1920929e-07, -0.8978114)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4978175, 0.6643137, 1.2070279)
